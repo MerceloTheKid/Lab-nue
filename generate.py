@@ -23,6 +23,10 @@ public_key = pub.exportKey()
 
 #print(private_key, "\n\n\n", public_key)
 
+text_file = open ("destino.txt", "w")
+n = text_file.write(pub.exportKey().decode("utf-8"))
+text_file.close()
+
 text_file = open ("origen.txt", "w")
 n = text_file.write(pri.exportKey().decode("utf-8"))
 text_file.close()
