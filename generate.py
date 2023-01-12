@@ -1,15 +1,9 @@
-import base64
-from Crypto import Random 
-from Crypto.PublicKey import RSA
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.primitives import serialization
 
-def toBase64(string):
-    return base64.b64encode(string)
 
 def generate_keys():
-    modulus_length = 256*4
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend())
     public_key = private_key.public_key()
     return private_key, public_key
