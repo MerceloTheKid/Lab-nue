@@ -1,31 +1,35 @@
 import base64
 from Crypto import Random 
 from Crypto.PublicKey import RSA
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
+from cryptography.hazmat.primitives import serialization
 
 def toBase64(string):
     return base64.b64encode(string)
-def generate_keys():
 
+def generate_keys():
     modulus_length = 256*4
-    private_key = RSA.generate(modulus_length, Random.new().read)
-    public_key = private_key.publickey()
+    private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend())
+    public_key = private_key.public_key()
     return private_key, public_key
 
 pri1, pub1 = generate_keys()
 pri2, pub2 = generate_keys()
 
-text_file = open ("destino_public.txt", "w")
-n = text_file.write(pub1.exportKey().decode("utf-8"))
-text_file.close()
+#transformacion de llave privada a foramte PEM
+pri_1 = pri1.private_bytes(encoding=serialization.Encoding.PEM,format=serialization.PrivateFormat.PKCS8,encryption_algorithm=serialization.NoEncryption())
+pri_2 = pri2.private_bytes(encoding=serialization.Encoding.PEM,format=serialization.PrivateFormat.PKCS8,encryption_algorithm=serialization.NoEncryption())
 
-text_file = open ("origen_public.txt", "w")
-n = text_file.write(pub2.exportKey().decode("utf-8"))
-text_file.close()
+#transformacion de llave publica a formato PEM
+pub_1 = pub1.public_bytes(encoding=serialization.Encoding.PEM,format=serialization.PublicFormat.SubjectPublicKeyInfo).decode("utf-8")  
+pub_2 = pub2.public_bytes(encoding=serialization.Encoding.PEM,format=serialization.PublicFormat.SubjectPublicKeyInfo).decode("utf-8")  
 
-text_file = open ("destino_private.txt", "w")
-n = text_file.write(pri1.exportKey().decode("utf-8"))
-text_file.close()
-
-text_file = open ("origen_private.txt", "w")
-n = text_file.write(pri2.exportKey().decode("utf-8"))
-text_file.close()
+with open ("destino_public.pem", "w") as mypublickey:
+ mypublickey.write(pub_1)
+with open ("origen_public.pem", "w") as mypublickey:
+ mypublickey.write(pub_2)
+with open ("destino_private.pem", "wb") as myprivatekey:
+ myprivatekey.write(pri_1)
+with open ("origen_private.pem", "wb") as myprivatekey:
+ myprivatekey.write(pri_2)
